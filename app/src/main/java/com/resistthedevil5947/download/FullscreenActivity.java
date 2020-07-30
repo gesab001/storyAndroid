@@ -1,6 +1,8 @@
 package com.resistthedevil5947.download;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -31,10 +33,12 @@ public class FullscreenActivity extends AppCompatActivity {
     JSONArray story = new JSONArray();
     JSONObject article = new JSONObject();
     JSONArray slides = new JSONArray();
+    JSONArray questions =new JSONArray();
     TextView textView;
     TextView indicator;
     ImageView imageView;
     String welcomeText;
+    String title;
     int slideNumber = -1;
     /**
      * Whether or not the system UI should be auto-hidden after
@@ -116,7 +120,7 @@ public class FullscreenActivity extends AppCompatActivity {
         mControlsView = findViewById(R.id.fullscreen_content_controls);
         mContentView = findViewById(R.id.fullscreen_content);
         Bundle bundle = getIntent().getExtras();
-        String title = bundle.getString("filename");
+        title = bundle.getString("filename");
         String filename = title.replace(" ", "_") + ".json";
 
         textView = findViewById(R.id.textView);
@@ -168,10 +172,26 @@ public class FullscreenActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 textViewTitle.setVisibility(View.GONE);
-                if (slideNumber<9){
+                if (slideNumber<10){
                     slideNumber = slideNumber + 1;
                     try {
-                        getImage();
+                        if(slideNumber==10){
+                            getQuizImage();
+                            textView.setText("Its quiz time! Click on the image above to start the quiz.");
+                            imageView.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Context context = v.getContext();
+                                    Intent intent = new Intent(context, QuizFullscreenActivity2.class);
+
+                                    intent.putExtra("questions", getQuestions());
+                                    context.startActivity(intent);
+                                }
+                            });
+                        }else{
+                            getImage();
+
+                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -309,6 +329,31 @@ public class FullscreenActivity extends AppCompatActivity {
 
         //Loading image using Picasso
         Picasso.get().load(imgurl).into(imageView);
+
     }
 
+    public void getQuizImage() throws JSONException {
+        String imgurl = "https://gesab001.github.io/assets/images/quiztime.jpg";
+
+        //Loading image using Picasso
+        Picasso.get().load(imgurl).into(imageView);
+
+    }
+
+    public String getQuestions(){
+        try {
+            questions = (JSONArray) article.get("questions");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return questions.toString();
+    }
+
+    public void getPrevSlide(){
+
+    }
+
+    public void getNextSlide(){
+
+    }
 }

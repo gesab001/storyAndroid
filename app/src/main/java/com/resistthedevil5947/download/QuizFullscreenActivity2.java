@@ -7,6 +7,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -18,6 +26,15 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
      */
     private static final boolean AUTO_HIDE = true;
+    String[] mobileArray = {"Android","IPhone","WindowsMobile", "Linux"};
+    JSONObject questionitem;
+    JSONArray questions;
+    String question;
+    String answer;
+    String[] choices;
+    TextView question_tv;
+    int questionnumber = 0;
+    Button submit_button;
 
     /**
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
@@ -88,11 +105,23 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_quiz_fullscreen2);
+        Bundle bundle = getIntent().getExtras();
+        try {
+            questions = new JSONArray (bundle.getString("questions"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
+        question_tv = (TextView)findViewById(R.id.question_tv);
+        loadQuestion();
         mVisible = true;
         mControlsView = findViewById(R.id.fullscreen_content_controls);
         mContentView = findViewById(R.id.fullscreen_content);
+        ArrayAdapter adapter = new ArrayAdapter<String>(this,
+                R.layout.activity_listview, mobileArray);
 
+        ListView listView = (ListView) findViewById(R.id.choices_list);
+        listView.setAdapter(adapter);
 
         // Set up the user interaction to manually show or hide the system UI.
         mContentView.setOnClickListener(new View.OnClickListener() {
@@ -106,6 +135,25 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
         findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
+
+        submit_button = (Button) findViewById(R.id.submit_button);
+
+        submit_button.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+
+                if (questionnumber<5){
+                    questionnumber = questionnumber + 1;
+                    loadQuestion();
+
+                }
+
+
+
+            }
+        });
+
     }
 
     @Override
@@ -159,5 +207,19 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
     private void delayedHide(int delayMillis) {
         mHideHandler.removeCallbacks(mHideRunnable);
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
+    }
+
+    public void loadQuestion(){
+        try {
+            questionitem = (JSONObject) questions.get(questionnumber);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        try {
+            question = (String) questionitem.getString("question");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        question_tv.setText(question);
     }
 }
