@@ -32,7 +32,9 @@ public class FullscreenActivity extends AppCompatActivity {
     JSONObject article = new JSONObject();
     JSONArray slides = new JSONArray();
     TextView textView;
+    TextView indicator;
     ImageView imageView;
+    String welcomeText;
     int slideNumber = -1;
     /**
      * Whether or not the system UI should be auto-hidden after
@@ -118,9 +120,11 @@ public class FullscreenActivity extends AppCompatActivity {
         String filename = title.replace(" ", "_") + ".json";
 
         textView = findViewById(R.id.textView);
-        TextView textViewTitle = (TextView) findViewById(R.id.textviewTitle);
+        indicator = findViewById(R.id.indicator);
+        final TextView textViewTitle = (TextView) findViewById(R.id.textviewTitle);
         textViewTitle.setText(title.toUpperCase());
-        textView.setText("Hello there.  In this story, we are going to talk about " + title + ".  Let's begin.");
+        welcomeText = "Hello there.  In this story, we are going to talk about " + title + ".  Let's begin.";
+        textView.setText(welcomeText);
         imageView = findViewById(R.id.imageView2);
         try {
             getStartingImage();
@@ -138,14 +142,23 @@ public class FullscreenActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if (slideNumber>0){
+                if (slideNumber>-2){
                     slideNumber = slideNumber - 1;
                     try {
-                        getImage();
+                        if(slideNumber==-1){
+                            getStartingImage();
+                            textViewTitle.setVisibility(View.VISIBLE);
+                            textView.setText(welcomeText);
+
+                        }else{
+                            getImage();
+                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
+
+
 
             }
         });
@@ -154,7 +167,8 @@ public class FullscreenActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                if (slideNumber<10){
+                textViewTitle.setVisibility(View.GONE);
+                if (slideNumber<9){
                     slideNumber = slideNumber + 1;
                     try {
                         getImage();
@@ -282,6 +296,7 @@ public class FullscreenActivity extends AppCompatActivity {
         JSONObject slide = (JSONObject) slides.get(slideNumber);
         String imgurl = (String) slide.get("image");
         String caption = (String) slide.get("text");
+        indicator.setText((slideNumber +1)+ "/10");
         textView.setText(caption);
 
 
