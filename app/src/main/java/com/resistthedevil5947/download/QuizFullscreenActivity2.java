@@ -1,6 +1,9 @@
 package com.resistthedevil5947.download;
 
 import android.annotation.SuppressLint;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,6 +21,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -144,6 +148,7 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
             public void onClick(View view) {
 
                 if (questionnumber<5){
+                    
                     questionnumber = questionnumber + 1;
                     loadQuestion();
 
@@ -224,7 +229,7 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
             String[] abc = {"A", "B", "C", "D"};
             for (int x=0; x<choicearray.length();x ++){
                 String choice = (String) choicearray.get(x);
-                choices.add(abc[x]+". " + choice);
+                choices.add(choice);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -244,9 +249,11 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
                 String userchoice = (String) choices.get(position);
                 if(answer.equals(userchoice)){
                     Log.i("correct", userchoice+answer);
+                    playCorrectSound();
 
                 }else{
                     Log.i("wrong. correct answer ", answer + userchoice);
+                    playWrongSound();
 
                 }
 
@@ -254,6 +261,32 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
         });
 
 
+    }
+
+    public void playCorrectSound(){
+        Uri myUri = Uri.parse("https://gesab001.github.io/assets/soundeffects/correct2.mp3");
+        try {
+            MediaPlayer mediaPlayer = new MediaPlayer();
+            mediaPlayer.setDataSource(this, myUri);
+            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            mediaPlayer.prepare(); //don't use prepareAsync for mp3 playback
+            mediaPlayer.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void playWrongSound(){
+        Uri myUri = Uri.parse("https://gesab001.github.io/assets/soundeffects/wrong2.mp3");
+        try {
+            MediaPlayer mediaPlayer = new MediaPlayer();
+            mediaPlayer.setDataSource(this, myUri);
+            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            mediaPlayer.prepare(); //don't use prepareAsync for mp3 playback
+            mediaPlayer.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
