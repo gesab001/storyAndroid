@@ -16,6 +16,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
@@ -31,7 +33,7 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
     JSONArray questions;
     String question;
     String answer;
-    String[] choices;
+    ArrayList<String> choices;
     TextView question_tv;
     int questionnumber = 0;
     Button submit_button;
@@ -117,11 +119,7 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
         mVisible = true;
         mControlsView = findViewById(R.id.fullscreen_content_controls);
         mContentView = findViewById(R.id.fullscreen_content);
-        ArrayAdapter adapter = new ArrayAdapter<String>(this,
-                R.layout.activity_listview, mobileArray);
 
-        ListView listView = (ListView) findViewById(R.id.choices_list);
-        listView.setAdapter(adapter);
 
         // Set up the user interaction to manually show or hide the system UI.
         mContentView.setOnClickListener(new View.OnClickListener() {
@@ -146,6 +144,7 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
                 if (questionnumber<5){
                     questionnumber = questionnumber + 1;
                     loadQuestion();
+
 
                 }
 
@@ -217,9 +216,23 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
         }
         try {
             question = (String) questionitem.getString("question");
+            answer = (String) questionitem.getString("answer");
+            JSONArray choicearray = (JSONArray) questionitem.getJSONArray("choices");
+            choices = new ArrayList<String>();
+            for (int x=0; x<choicearray.length();x ++){
+                String choice = (String) choicearray.get(x);
+                choices.add(choice);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
         question_tv.setText(question);
+        ArrayAdapter adapter = new ArrayAdapter<String>(this,
+                R.layout.activity_listview, choices);
+
+        ListView listView = (ListView) findViewById(R.id.choices_list);
+        listView.setAdapter(adapter);
     }
+
+
 }
