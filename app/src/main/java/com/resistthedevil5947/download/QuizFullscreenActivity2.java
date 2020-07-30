@@ -5,8 +5,10 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -219,9 +221,10 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
             answer = (String) questionitem.getString("answer");
             JSONArray choicearray = (JSONArray) questionitem.getJSONArray("choices");
             choices = new ArrayList<String>();
+            String[] abc = {"A", "B", "C", "D"};
             for (int x=0; x<choicearray.length();x ++){
                 String choice = (String) choicearray.get(x);
-                choices.add(choice);
+                choices.add(abc[x]+". " + choice);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -232,6 +235,25 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
 
         ListView listView = (ListView) findViewById(R.id.choices_list);
         listView.setAdapter(adapter);
+
+
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String userchoice = (String) choices.get(position);
+                if(answer.equals(userchoice)){
+                    Log.i("correct", userchoice+answer);
+
+                }else{
+                    Log.i("wrong. correct answer ", answer + userchoice);
+
+                }
+
+            }
+        });
+
+
     }
 
 
