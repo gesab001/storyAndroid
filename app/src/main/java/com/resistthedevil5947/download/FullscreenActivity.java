@@ -7,6 +7,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -139,7 +140,7 @@ public class FullscreenActivity extends AppCompatActivity {
         Button prev = (Button) findViewById(R.id.button);
         Button next = (Button) findViewById(R.id.button2);
         String url = "https://gesab001.github.io/assets/story/articles/"+filename;
-        getArticle(url);
+        getArticle(url, filename);
 
         prev.setOnClickListener(new View.OnClickListener() {
 
@@ -268,32 +269,42 @@ public class FullscreenActivity extends AppCompatActivity {
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
-    public void getArticle(String url){
+    public void getArticle(String url, String filename){
+        MyData2 myData2 = new MyData2(this, filename, url);
+        myData2.getArticleFromRemoteStorage(url);
+        myData2.getArticleFromLocalStorage(filename);
+        JSONObject jsonObject = myData2.getJsonObject();
+        Log.i("localstoragetest: ", jsonObject.toString());
+        try {
+            loadArticle(jsonObject);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
-        RequestQueue queue = Volley.newRequestQueue(this);
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            loadArticle(response);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        textView.setText(error.toString());
-
-                    }
-                });
-
-// Access the RequestQueue through your singleton class.
-        queue.add(jsonObjectRequest);
+//        RequestQueue queue = Volley.newRequestQueue(this);
+//
+//        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+//                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+//
+//                    @Override
+//                    public void onResponse(JSONObject response) {
+//                        try {
+//                            loadArticle(response);
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }, new Response.ErrorListener() {
+//
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+//                        textView.setText(error.toString());
+//
+//                    }
+//                });
+//
+//// Access the RequestQueue through your singleton class.
+//        queue.add(jsonObjectRequest);
     }
 
     public void loadArticle(JSONObject response) throws JSONException {
@@ -328,7 +339,7 @@ public class FullscreenActivity extends AppCompatActivity {
         String imgurl = "https://gesab001.github.io/assets/images/sunset.jpg";
 
         //Loading image using Picasso
-        Picasso.get().load(imgurl).into(imageView);
+        Picasso.get().load(imgurl).error(R.drawable.ic_portable_wifi_off_black_24dp).into(imageView);
 
     }
 

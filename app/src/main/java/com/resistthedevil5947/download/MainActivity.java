@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -71,9 +72,16 @@ public class MainActivity extends AppCompatActivity {
 
         data = new ArrayList<DataModel>();
         data2 = new ArrayList<DataModel2>();
-        MyData2 myData2 = new MyData2();
-        JSONArray jsonArray = new JSONArray();
-        jsonArray = myData2.getArray();
+        String filename = "stories.json";
+        String url = "https://gesab001.github.io/assets/story/stories.json";
+        MyData2 myData2 = new MyData2(this, filename, url);
+        myData2.getFromRemoteStorage(url);
+        JSONArray jsonArray = myData2.getFromLocalStorage(filename);
+        Log.i("localstoragetest: ", jsonArray.toString());
+
+
+
+
         for (int i = 0; i < jsonArray.length(); i++) {
              JSONObject jsonObject = new JSONObject();
             try {
