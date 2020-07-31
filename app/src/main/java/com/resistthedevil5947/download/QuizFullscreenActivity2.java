@@ -25,6 +25,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -253,6 +254,7 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
                 String choice = (String) choicearray.get(x);
                 choices.add(choice);
             }
+            Collections.shuffle(choices);
         } catch (JSONException e) {
             e.printStackTrace();
         }
