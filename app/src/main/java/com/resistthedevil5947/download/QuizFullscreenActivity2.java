@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,6 +41,7 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
     JSONArray questions;
     String question;
     String answer;
+    String userchoice;
     ArrayList<String> choices;
     TextView question_tv;
     int questionnumber = 0;
@@ -148,9 +151,28 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
             public void onClick(View view) {
 
                 if (questionnumber<5){
-                    
-                    questionnumber = questionnumber + 1;
-                    loadQuestion();
+                    if(answer.equals(userchoice)){
+                        Log.i("correct", userchoice+answer);
+                        playCorrectSound();
+                        Toast toast = Toast.makeText(getApplicationContext(),
+                                "CORRECT",
+                                Toast.LENGTH_SHORT);
+
+                        toast.show();
+                        questionnumber = questionnumber + 1;
+                        loadQuestion();
+
+                    }else{
+                        Log.i("wrong. correct answer ", answer + userchoice);
+                        playWrongSound();
+                        Toast toast = Toast.makeText(getApplicationContext(),
+                                "WRONG",
+                                Toast.LENGTH_SHORT);
+
+                        toast.show();
+
+                    }
+
 
 
                 }
@@ -235,10 +257,10 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
             e.printStackTrace();
         }
         question_tv.setText(question);
-        ArrayAdapter adapter = new ArrayAdapter<String>(this,
+        final ArrayAdapter adapter = new ArrayAdapter<String>(this,
                 R.layout.activity_listview, choices);
 
-        ListView listView = (ListView) findViewById(R.id.choices_list);
+        final ListView listView = (ListView) findViewById(R.id.choices_list);
         listView.setAdapter(adapter);
 
 
@@ -246,17 +268,8 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String userchoice = (String) choices.get(position);
-                if(answer.equals(userchoice)){
-                    Log.i("correct", userchoice+answer);
-                    playCorrectSound();
-
-                }else{
-                    Log.i("wrong. correct answer ", answer + userchoice);
-                    playWrongSound();
-
-                }
-
+                userchoice = (String) choices.get(position);
+                userchoice = (String) parent.getItemAtPosition(position);
             }
         });
 

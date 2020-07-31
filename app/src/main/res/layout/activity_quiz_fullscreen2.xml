@@ -43,6 +43,8 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="4"
+            android:listSelector="@android:color/holo_red_dark"
+
 
             />
         <Button
@@ -79,7 +81,13 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/dummy_button" />
+                android:text="@string/dummy_button"
+                android:textColor="@color/color_white"
+                android:background="@color/blue"
+                android:shadowColor="@color/text_shadow"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="2"/>
 
         </LinearLayout>
     </FrameLayout>
