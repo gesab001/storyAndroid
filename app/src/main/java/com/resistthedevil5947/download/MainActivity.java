@@ -73,15 +73,17 @@ public class MainActivity extends AppCompatActivity {
         data = new ArrayList<DataModel>();
         data2 = new ArrayList<DataModel2>();
         String filename = "stories.json";
-        String url = "https://gesab001.github.io/assets/story/stories.json";
-        MyData2 myData2 = new MyData2(this, filename, url);
-        myData2.getFromRemoteStorage(url);
+        String githuburl = "https://gesab001.github.io/assets/story/stories.json";
+        String localurl = "http://192.168.1.70/assets/story/stories.json";
+
+        MyData2 myData2 = new MyData2(this, filename, githuburl, localurl);
+        myData2.getFromGithubStorage();
         JSONArray jsonArray = myData2.getFromLocalStorage(filename);
         Log.i("localstoragetest: ", jsonArray.toString());
-
-
-
-
+//
+//
+//
+//
         for (int i = 0; i < jsonArray.length(); i++) {
              JSONObject jsonObject = new JSONObject();
             try {

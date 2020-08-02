@@ -2,6 +2,7 @@ package com.resistthedevil5947.download;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import com.android.volley.Request;
@@ -19,15 +20,20 @@ import org.json.JSONObject;
 public class MyData2 {
 
     JSONArray jsonArray;
+    JSONArray story = new JSONArray();
+    int status = 0;
     JSONObject jsonObject;
     Context context;
     String filename;
-    String url;
+    String githuburl;
+    String homeurl;
 
-    public MyData2(Context context, String filename, String url){
+    public MyData2(Context context, String filename, String githuburl, String homeurl){
         this.context = context;
         this.filename = filename;
-        this.url = url;
+        this.githuburl = githuburl;
+        this.homeurl = homeurl;
+
     }
     //    static String[] letters = {"A", "B", "C", "D", "E", "F", "G","H", "I", "J", "K"};
 //
@@ -75,11 +81,11 @@ public class MyData2 {
         fileWriter.writeToFile(data, filename);
     }
 
-    public void getArticleFromRemoteStorage(String url){
+    public void getArticleFromGithubStorage(){
         RequestQueue queue = Volley.newRequestQueue(context);
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+                (Request.Method.GET, githuburl, null, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
@@ -91,7 +97,9 @@ public class MyData2 {
 
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.i("error downloading:", error.toString());
+                        Log.i("error downloading:", error.toString() + "getArticleFromgithubstorage");
+                        getArticleFromHomeServer();
+
 
                     }
                 });
@@ -99,17 +107,75 @@ public class MyData2 {
 // Access the RequestQueue through your singleton class.
         queue.add(jsonObjectRequest);
     }
-    public void getFromRemoteStorage(String url){
+
+    public void getArticleFromHomeServer(){
+        RequestQueue queue = Volley.newRequestQueue(context);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, githuburl, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.i("articleremote:", response.toString());
+                        saveArticleToLocalStroage(response);
+
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.i("error downloading:", error.toString());
+
+
+                    }
+                });
+
+// Access the RequestQueue through your singleton class.
+        queue.add(jsonObjectRequest);
+    }
+
+    public void getFromGithubStorage(){
         RequestQueue queue = Volley.newRequestQueue(context);
         JsonArrayRequest jsonObjectRequest = new JsonArrayRequest
-                (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+                (Request.Method.GET, githuburl, null, new Response.Listener<JSONArray>() {
 
                     @Override
                     public void onResponse(JSONArray response) {
+                        status = response.length();
+                        if(status>0)
+                            setJsonArray(response);
 
-                            JSONArray story = (JSONArray) response;
-                            setJsonArray(story);
-                     }
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.i("error", error.toString());
+                        getFromHomeServer();
+
+                    }
+                });
+
+// Access the RequestQueue through your singleton class.
+        queue.add(jsonObjectRequest);
+        Log.i("status", Integer.toString(status));
+
+
+
+    }
+
+    public void getFromHomeServer(){
+        RequestQueue queue = Volley.newRequestQueue(context);
+        JsonArrayRequest jsonObjectRequest = new JsonArrayRequest
+                (Request.Method.GET, homeurl, null, new Response.Listener<JSONArray>() {
+
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        status = response.length();
+                        if(status>0)
+                            setJsonArray(response);
+
+                    }
                 }, new Response.ErrorListener() {
 
                     @Override
@@ -121,6 +187,10 @@ public class MyData2 {
 
 // Access the RequestQueue through your singleton class.
         queue.add(jsonObjectRequest);
+        Log.i("status", Integer.toString(status));
+
+
+
     }
 
     public void setJsonArray(JSONArray response){

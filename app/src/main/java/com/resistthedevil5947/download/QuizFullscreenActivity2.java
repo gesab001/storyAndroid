@@ -154,7 +154,12 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
                 if (questionnumber<5){
                     if(answer.equals(userchoice)){
                         Log.i("correct", userchoice+answer);
-                        playCorrectSound();
+                        try{
+                            playCorrectSound();
+
+                        }catch (Exception err){
+                            Log.i("correctsounderror:", err.toString());
+                        }
                         Toast toast = Toast.makeText(getApplicationContext(),
                                 "CORRECT",
                                 Toast.LENGTH_SHORT);
@@ -165,7 +170,12 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
 
                     }else{
                         Log.i("wrong. correct answer ", answer + userchoice);
-                        playWrongSound();
+                        try{
+                            playWrongSound();
+
+                        }catch (Exception err){
+                            Log.i("correctsounderror:", err.toString());
+                        }
                         Toast toast = Toast.makeText(getApplicationContext(),
                                 "WRONG",
                                 Toast.LENGTH_SHORT);
@@ -280,6 +290,7 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
 
     public void playCorrectSound(){
         Uri myUri = Uri.parse("https://gesab001.github.io/assets/soundeffects/correct2.mp3");
+        myUri = Uri.parse("http://192.168.1.70/assets/soundeffects/soundeffects/correct2.mp3");
         try {
             MediaPlayer mediaPlayer = new MediaPlayer();
             mediaPlayer.setDataSource(this, myUri);
@@ -293,6 +304,8 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
 
     public void playWrongSound(){
         Uri myUri = Uri.parse("https://gesab001.github.io/assets/soundeffects/wrong2.mp3");
+        myUri = Uri.parse("http://192.168.1.70/assets/soundeffects/soundeffects/wrong2.mp3");
+
         try {
             MediaPlayer mediaPlayer = new MediaPlayer();
             mediaPlayer.setDataSource(this, myUri);

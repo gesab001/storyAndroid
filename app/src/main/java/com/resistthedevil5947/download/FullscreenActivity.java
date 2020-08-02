@@ -3,6 +3,7 @@ package com.resistthedevil5947.download;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -139,8 +140,17 @@ public class FullscreenActivity extends AppCompatActivity {
         // Instantiate the RequestQueue.
         Button prev = (Button) findViewById(R.id.button);
         Button next = (Button) findViewById(R.id.button2);
-        String url = "https://gesab001.github.io/assets/story/articles/"+filename;
-        getArticle(url, filename);
+        String githuburl = "https://gesab001.github.io/assets/story/articles/"+filename;
+        String localurl = "http://192.168.1.70/assets/story/articles/"+filename;
+
+
+
+        try{
+            getArticle(filename, githuburl, localurl);
+
+        }catch (Exception err){
+            textView.setText("not connected to the internet");
+        }
 
         prev.setOnClickListener(new View.OnClickListener() {
 
@@ -269,9 +279,9 @@ public class FullscreenActivity extends AppCompatActivity {
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
-    public void getArticle(String url, String filename){
-        MyData2 myData2 = new MyData2(this, filename, url);
-        myData2.getArticleFromRemoteStorage(url);
+    public void getArticle(String filename, String githuburl, String homeurl){
+        MyData2 myData2 = new MyData2(this, filename, githuburl, homeurl);
+        myData2.getArticleFromGithubStorage();
         myData2.getArticleFromLocalStorage(filename);
         JSONObject jsonObject = myData2.getJsonObject();
         Log.i("localstoragetest: ", jsonObject.toString());
@@ -325,30 +335,90 @@ public class FullscreenActivity extends AppCompatActivity {
 
     public void getImage() throws JSONException {
         JSONObject slide = (JSONObject) slides.get(slideNumber);
-        String imgurl = (String) slide.get("image");
+        final String githuburl = (String) slide.get("image");
         String caption = (String) slide.get("text");
         indicator.setText((slideNumber +1)+ "/10");
         textView.setText(caption);
 
 
         //Loading image using Picasso
-        Picasso.get().load(imgurl).into(imageView);
+//        Picasso.get().load(imgurl).error(R.drawable.ic_portable_wifi_off_black_24dp).into(imageView);
+        Picasso.Builder builder = new Picasso.Builder(this);
+        builder.listener(new Picasso.Listener()
+        {
+            @Override
+            public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception)
+            {
+                String folder = title.toLowerCase().replace(" ", "");
+                String filename = githuburl.substring(githuburl.lastIndexOf("/")+1);
+                String homeurl = "http://192.168.1.70/assets/public/images/"+folder+"/"+filename;
+                Log.i("imageloadfaile", "getting slide image from home server");
+
+                getImagefromHomeServer(homeurl);
+            }
+        });
+        Log.i("getImage", "getting slide image from github");
+        builder.build().load(githuburl).into(imageView);
     }
 
     public void getStartingImage() throws JSONException {
-        String imgurl = "https://gesab001.github.io/assets/images/sunset.jpg";
+        String githuburl = "https://gesab001.github.io/assets/images/sunset.jpg";
+        final String homeurl = "http://192.168.1.70/assets/public/images/sunset.jpg";
 
         //Loading image using Picasso
-        Picasso.get().load(imgurl).error(R.drawable.ic_portable_wifi_off_black_24dp).into(imageView);
+//        Picasso.get().load(githuburl).error(R.drawable.ic_portable_wifi_off_black_24dp).into(imageView);
+        Picasso.Builder builder = new Picasso.Builder(this);
+        builder.listener(new Picasso.Listener()
+        {
+            @Override
+            public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception)
+            {
+                Log.i("imageloadfaile", "getting slide image from home server");
 
+                getImagefromHomeServer(homeurl);
+            }
+        });
+        Log.i("getImage", "getting slide image from github");
+
+        builder.build().load(githuburl).into(imageView);
     }
 
-    public void getQuizImage() throws JSONException {
-        String imgurl = "https://gesab001.github.io/assets/images/quiztime.jpg";
+    public void getImagefromHomeServer(String url){
+//        Picasso.get().load(url).error(R.drawable.ic_portable_wifi_off_black_24dp).into(imageView);
+        Picasso.Builder builder = new Picasso.Builder(this);
+        builder.listener(new Picasso.Listener()
+        {
+            @Override
+            public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception)
+            {
+                textView.setText("please connect to the internet");
+                imageView.setImageResource(R.drawable.ic_portable_wifi_off_black_24dp);
+                Log.i("imageloadfaile", "cannot load image, connect to the internet");
 
-        //Loading image using Picasso
-        Picasso.get().load(imgurl).into(imageView);
+            }
+        });
+        builder.build().load(url).into(imageView);
 
+    }
+    public void getQuizImage(){
+        String githuburl = "https://gesab001.github.io/assets/images/quiztime.jpg";
+
+
+        Picasso.Builder builder = new Picasso.Builder(this);
+        builder.listener(new Picasso.Listener()
+        {
+            @Override
+            public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception)
+            {
+                String homeurl = "http://192.168.1.70/assets/public/images/quiztime.jpg";
+                Log.i("imageloadfaile", "getting slide image from home server");
+
+                getImagefromHomeServer(homeurl);
+            }
+        });
+        Log.i("getImage", "getting slide image from github");
+
+        builder.build().load(githuburl).into(imageView);
     }
 
     public String getQuestions(){
