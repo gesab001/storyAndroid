@@ -47,6 +47,10 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
     TextView question_tv;
     int questionnumber = 0;
     Button submit_button;
+    Button tryagain_button;
+    MediaPlayer mediaPlayer = new MediaPlayer();
+    int mistakes = 0;
+    ListView listView;
 
     /**
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
@@ -112,6 +116,10 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
         }
     };
 
+    public QuizFullscreenActivity2() {
+        listView = null;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -145,11 +153,12 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
         findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
 
         submit_button = (Button) findViewById(R.id.submit_button);
-
+        tryagain_button = (Button) findViewById(R.id.tryagain_button);
         submit_button.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
+                questionnumber = questionnumber + 1;
 
                 if (questionnumber<5){
                     if(answer.equals(userchoice)){
@@ -165,7 +174,6 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
                                 Toast.LENGTH_SHORT);
 
                         toast.show();
-                        questionnumber = questionnumber + 1;
                         loadQuestion();
 
                     }else{
@@ -187,6 +195,30 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
 
 
                 }
+                if (questionnumber==5){
+                    question_tv.setText("YOU MADE " + Integer.toString(mistakes) + " mistakes");
+                    listView.setVisibility(View.GONE);
+                    tryagain_button.setVisibility(View.VISIBLE);
+                    submit_button.setVisibility(View.GONE);
+
+
+                }
+
+
+
+            }
+        });
+        tryagain_button.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                questionnumber = 0;
+                mistakes = 0;
+                loadQuestion();
+                tryagain_button.setVisibility(View.GONE);
+                submit_button.setVisibility(View.VISIBLE);
+                listView.setVisibility(View.VISIBLE);
+
 
 
 
@@ -268,11 +300,11 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        question_tv.setText(question);
+        question_tv.setText(Integer.toString(questionnumber+1) + ". " + question );
         final ArrayAdapter adapter = new ArrayAdapter<String>(this,
                 R.layout.activity_listview, choices);
 
-        final ListView listView = (ListView) findViewById(R.id.choices_list);
+        listView = (ListView) findViewById(R.id.choices_list);
         listView.setAdapter(adapter);
 
 
@@ -289,32 +321,72 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
     }
 
     public void playCorrectSound(){
-        Uri myUri = Uri.parse("https://gesab001.github.io/assets/soundeffects/correct2.mp3");
-        myUri = Uri.parse("http://192.168.1.70/assets/soundeffects/soundeffects/correct2.mp3");
+        mediaPlayer=MediaPlayer.create(this, R.raw.correct2);
+        mediaPlayer.start();
+//        Uri myUri = Uri.parse("https://gesab001.github.io/assets/soundeffects/correct2.mp3");
+//        try {
+//            mediaPlayer = new MediaPlayer();
+//            mediaPlayer.setDataSource(this, myUri);
+//            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+//            mediaPlayer.prepare(); //don't use prepareAsync for mp3 playback
+//            mediaPlayer.start();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            playCorrectSound2();
+//        }
+    }
+
+
+    public void playCorrectSound2(){
+        Uri myUri = Uri.parse("http://192.168.1.70/assets/soundeffects/soundeffects/correct2.mp3");
         try {
-            MediaPlayer mediaPlayer = new MediaPlayer();
+            mediaPlayer = new MediaPlayer();
             mediaPlayer.setDataSource(this, myUri);
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mediaPlayer.prepare(); //don't use prepareAsync for mp3 playback
             mediaPlayer.start();
         } catch (IOException e) {
             e.printStackTrace();
+            mediaPlayer=MediaPlayer.create(this, R.raw.correct2);
+            mediaPlayer.start();
         }
     }
 
     public void playWrongSound(){
-        Uri myUri = Uri.parse("https://gesab001.github.io/assets/soundeffects/wrong2.mp3");
-        myUri = Uri.parse("http://192.168.1.70/assets/soundeffects/soundeffects/wrong2.mp3");
+//        Uri githuburl = Uri.parse("https://gesab001.github.io/assets/soundeffects/wrong2.mp3");
+        mediaPlayer=MediaPlayer.create(this, R.raw.wrong2);
+        mediaPlayer.start();
+        mistakes = mistakes + 1;
+//        try {
+//            mediaPlayer.setDataSource(this, githuburl);
+//            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+//            mediaPlayer.prepare(); //don't use prepareAsync for mp3 playback
+//            mediaPlayer.start();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            playWrongSound2();
+//
+//        }
+    }
+    public void playWrongSound2(){
+        mediaPlayer=MediaPlayer.create(this, R.raw.wrong2);
+        mediaPlayer.start();
 
-        try {
-            MediaPlayer mediaPlayer = new MediaPlayer();
-            mediaPlayer.setDataSource(this, myUri);
-            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            mediaPlayer.prepare(); //don't use prepareAsync for mp3 playback
-            mediaPlayer.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        Uri homeurl = Uri.parse("http://192.168.1.70/assets/soundeffects/soundeffects/wrong2.mp3");
+//
+//        try {
+//            mediaPlayer = new MediaPlayer();
+//            mediaPlayer.setDataSource(this, homeurl);
+//            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+//            mediaPlayer.prepare(); //don't use prepareAsync for mp3 playback
+//            mediaPlayer.start();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//
+//            mediaPlayer=MediaPlayer.create(this, R.raw.wrong2);
+//            mediaPlayer.start();
+//
+//        }
     }
 
 
