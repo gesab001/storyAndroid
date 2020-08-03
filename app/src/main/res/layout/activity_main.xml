@@ -57,11 +57,17 @@
     android:background="@color/grey_300"
     >
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/downloadstories_button"
+        android:text="Download stories list"/>
     <android.support.v7.widget.RecyclerView
         android:id="@+id/my_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="vertical"
+        android:visibility="gone"
         />
 
 </RelativeLayout>

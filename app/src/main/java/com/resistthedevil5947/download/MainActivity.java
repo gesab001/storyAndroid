@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -43,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
     private RecyclerView.LayoutManager layoutManager;
     private RecyclerView.LayoutManager layoutManager2;
-
+    private Button dowloadstoriesbutton;
     private static RecyclerView recyclerView2;
     private static RecyclerView recyclerView;
 
@@ -65,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-
+        dowloadstoriesbutton = (Button) findViewById(R.id.downloadstories_button);
 //        layoutManager2 = new LinearLayoutManager(this);
 //        recyclerView2.setLayoutManager(layoutManager);
 //        recyclerView2.setItemAnimator(new DefaultItemAnimator());
@@ -76,47 +77,33 @@ public class MainActivity extends AppCompatActivity {
         String githuburl = "https://gesab001.github.io/assets/story/stories.json";
         String localurl = "http://192.168.1.70/assets/story/stories.json";
 
-        MyData2 myData2 = new MyData2(this, filename, githuburl, localurl);
-        myData2.getFromGithubStorage();
-        JSONArray jsonArray = myData2.getFromLocalStorage(filename);
-        Log.i("localstoragetest: ", jsonArray.toString());
-//
-//
-//
-//
-        for (int i = 0; i < jsonArray.length(); i++) {
-             JSONObject jsonObject = new JSONObject();
-            try {
-                jsonObject = (JSONObject) jsonArray.get(i);
-                String letter = jsonObject.getString("letter");
-                JSONArray names = jsonObject.getJSONArray("names");
-                int total = 0;
-                DataModel2 item = new DataModel2(letter, total);
-                data2.add(item);
-                if (names.length()>0){
-                    for (int x=0; x<names.length(); x++){
-                        String title = (String) names.get(x);
-                        DataModel2 itemtitle = new DataModel2(title);
-                        data2.add(itemtitle);
-                    }
+        FileWriter fileWriter = new FileWriter(this);
 
 
+        if (!fileWriter.fileExists(filename)) {
+            dowloadstoriesbutton.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View view) {
+                    String filename = "stories.json";
+                    String githuburl = "https://gesab001.github.io/assets/story/stories.json";
+                    String localurl = "http://192.168.1.70/assets/story/stories.json";
+                    MyData2 myData2 = new MyData2(getApplicationContext(), filename, githuburl, localurl);
+                    myData2.getFromGithubStorage();
+                    loadStories(filename, githuburl, localurl);
                 }
+            });
 
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+        }else{
+            loadStories(filename, githuburl, localurl);
         }
 
-        removedItems = new ArrayList<Integer>();
 
-//        adapter = new CustomAdapter(data);
-        adapter2 = new LettersAdapter(this, data2);
 
-//        recyclerView.setAdapter(adapter);
-        recyclerView.setAdapter(adapter2);
+
 
     }
+
 
 
     private static class MyOnClickListener implements View.OnClickListener {
@@ -151,6 +138,51 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void loadStories(String filename, String githuburl, String localurl){
+        FileWriter filewriter = new FileWriter(this);
+        if(filewriter.fileExists(filename)) {
+            dowloadstoriesbutton.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+            MyData2 myData2 = new MyData2(this, filename, githuburl, localurl);
+            JSONArray jsonArray = myData2.getFromLocalStorage(filename);
+            Log.i("localstoragetest: ", jsonArray.toString());
+            //
+            //
+            //
+            //
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject = (JSONObject) jsonArray.get(i);
+                    String letter = jsonObject.getString("letter");
+                    JSONArray names = jsonObject.getJSONArray("names");
+                    int total = 0;
+                    DataModel2 item = new DataModel2(letter, total);
+                    data2.add(item);
+                    if (names.length() > 0) {
+                        for (int x = 0; x < names.length(); x++) {
+                            String title = (String) names.get(x);
+                            DataModel2 itemtitle = new DataModel2(title);
+                            data2.add(itemtitle);
+                        }
+
+
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            removedItems = new ArrayList<Integer>();
+
+            //        adapter = new CustomAdapter(data);
+            adapter2 = new LettersAdapter(this, data2);
+
+            //        recyclerView.setAdapter(adapter);
+            recyclerView.setAdapter(adapter2);
+        }
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
