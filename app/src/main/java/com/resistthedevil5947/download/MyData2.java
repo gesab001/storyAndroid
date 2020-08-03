@@ -22,7 +22,7 @@ public class MyData2 {
     JSONArray jsonArray;
     JSONArray story = new JSONArray();
     int status = 0;
-    JSONObject jsonObject;
+    JSONObject jsonObject = null;
     Context context;
     String filename;
     String githuburl;
@@ -66,12 +66,14 @@ public class MyData2 {
     public JSONObject getArticleFromLocalStorage(String filename){
 
         FileWriter fileWriter = new FileWriter(context){};
-        String jsondata = fileWriter.readFromFile(filename);
-        Log.i("articlelocalstorage", jsondata);
+
         try {
+            String jsondata = fileWriter.readFromFile(filename);
+            Log.i("articlelocalstorage", jsondata);
             jsonObject = new JSONObject(jsondata);
         } catch (JSONException e) {
             e.printStackTrace();
+            jsonObject = null;
         }
         return jsonObject;
     }

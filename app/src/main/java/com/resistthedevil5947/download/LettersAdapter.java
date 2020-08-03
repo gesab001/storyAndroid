@@ -70,16 +70,24 @@ public class LettersAdapter extends RecyclerView.Adapter<LettersAdapter.MyViewHo
     public void onBindViewHolder(final MyViewHolder holder, final int listPosition) {
 
         TextView textView = holder.textView;
-        Button downloadButton = holder.downloadButton;
+        final Button downloadButton = holder.downloadButton;
         String groupletter = dataSet.get(listPosition).getLetter();
         final String title = dataSet.get(listPosition).getTitle();
+
         if (groupletter!=null){
             textView.setText(groupletter);
             downloadButton.setVisibility(View.GONE);
         }
         if(title!=null){
+            String filename = title.replace(" ", "_") + ".json";
+
             textView.setText(title);
-            downloadButton.setVisibility(View.VISIBLE);
+            if(checkFileExist(filename)){
+                downloadButton.setVisibility(View.GONE);
+            }else{
+                downloadButton.setVisibility(View.VISIBLE);
+
+            }
 
         }
        downloadButton.setOnClickListener(new View.OnClickListener() {
@@ -91,7 +99,7 @@ public class LettersAdapter extends RecyclerView.Adapter<LettersAdapter.MyViewHo
                String githuburl = "https://gesab001.github.io/assets/story/articles/"+filename;
                String localurl = "http://192.168.1.70/assets/story/articles/"+filename;
                Log.i("downloadbutton", title);
-               getArticle(filename, githuburl, localurl);
+               getArticle(filename, githuburl, localurl, downloadButton);
            }
        });
     }
@@ -101,13 +109,18 @@ public class LettersAdapter extends RecyclerView.Adapter<LettersAdapter.MyViewHo
         return dataSet.size();
     }
 
-    public void getArticle(String filename, String githuburl, String homeurl){
+    public void getArticle(String filename, String githuburl, String homeurl, Button downloadbutton){
         MyData2 myData2 = new MyData2(context, filename, githuburl, homeurl);
         myData2.getArticleFromGithubStorage();
-//        myData2.getArticleFromLocalStorage(filename);
-//        JSONObject jsonObject = myData2.getJsonObject();
-//        Log.i("localstoragetest: ", jsonObject.toString());
+        if(checkFileExist(filename)){
+            downloadbutton.setVisibility(View.GONE);
+        }
 
+    }
+
+    public boolean checkFileExist(String filename){
+        FileWriter fileWriter= new FileWriter(context);
+        return fileWriter.fileExists(filename);
 
     }
 
