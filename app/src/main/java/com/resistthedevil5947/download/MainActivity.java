@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
         removedItems = new ArrayList<Integer>();
 
 //        adapter = new CustomAdapter(data);
-        adapter2 = new LettersAdapter(data2);
+        adapter2 = new LettersAdapter(this, data2);
 
 //        recyclerView.setAdapter(adapter);
         recyclerView.setAdapter(adapter2);

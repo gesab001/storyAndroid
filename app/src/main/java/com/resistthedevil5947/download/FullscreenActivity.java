@@ -140,7 +140,6 @@ public class FullscreenActivity extends AppCompatActivity {
         mContentView = findViewById(R.id.fullscreen_content);
         Bundle bundle = getIntent().getExtras();
         title = bundle.getString("filename");
-        String filename = title.replace(" ", "_") + ".json";
 
         textView = findViewById(R.id.textView);
         indicator = findViewById(R.id.indicator);
@@ -159,6 +158,8 @@ public class FullscreenActivity extends AppCompatActivity {
         // Instantiate the RequestQueue.
         Button prev = (Button) findViewById(R.id.button);
         Button next = (Button) findViewById(R.id.button2);
+        String filename = title.replace(" ", "_") + ".json";
+
         String githuburl = "https://gesab001.github.io/assets/story/articles/"+filename;
         String localurl = "http://192.168.1.70/assets/story/articles/"+filename;
 
@@ -351,30 +352,6 @@ public class FullscreenActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-//        RequestQueue queue = Volley.newRequestQueue(this);
-//
-//        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-//                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-//
-//                    @Override
-//                    public void onResponse(JSONObject response) {
-//                        try {
-//                            loadArticle(response);
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                }, new Response.ErrorListener() {
-//
-//                    @Override
-//                    public void onErrorResponse(VolleyError error) {
-//                        textView.setText(error.toString());
-//
-//                    }
-//                });
-//
-//// Access the RequestQueue through your singleton class.
-//        queue.add(jsonObjectRequest);
     }
 
     public void loadArticle(JSONObject response) throws JSONException {
