@@ -1,5 +1,7 @@
 package com.resistthedevil5947.download;
 
+import java.util.Locale;
+import android.speech.tts.TextToSpeech;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +15,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -32,6 +35,7 @@ import org.json.JSONObject;
  * status bar and navigation/system bar) with user interaction.
  */
 public class FullscreenActivity extends AppCompatActivity {
+    TextToSpeech t1;
     JSONArray story = new JSONArray();
     JSONObject article = new JSONObject();
     JSONArray slides = new JSONArray();
@@ -39,9 +43,11 @@ public class FullscreenActivity extends AppCompatActivity {
     TextView textView;
     TextView indicator;
     ImageView imageView;
+    ScrollView scrollView;
     String welcomeText;
     String title;
     int slideNumber = -1;
+    String caption;
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -91,6 +97,7 @@ public class FullscreenActivity extends AppCompatActivity {
         }
     };
     private boolean mVisible;
+    private boolean mVisibletts;
     private final Runnable mHideRunnable = new Runnable() {
         @Override
         public void run() {
@@ -117,6 +124,16 @@ public class FullscreenActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_fullscreen);
+        t1=new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status != TextToSpeech.ERROR) {
+                    t1.setLanguage(Locale.UK);
+                    Double obj = new Double("0.5");
+                    t1.setSpeechRate(obj.floatValue());
+                }
+            }
+        });
 
         mVisible = true;
         mControlsView = findViewById(R.id.fullscreen_content_controls);
@@ -134,6 +151,8 @@ public class FullscreenActivity extends AppCompatActivity {
         imageView = findViewById(R.id.imageView2);
         try {
             getStartingImage();
+            playCaption(welcomeText);
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -156,6 +175,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
+                mVisibletts = true;
 
                 if (slideNumber>-2){
                     slideNumber = slideNumber - 1;
@@ -164,6 +184,7 @@ public class FullscreenActivity extends AppCompatActivity {
                             getStartingImage();
                             textViewTitle.setVisibility(View.VISIBLE);
                             textView.setText(welcomeText);
+
 
                         }else{
                             getImage();
@@ -183,12 +204,16 @@ public class FullscreenActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 textViewTitle.setVisibility(View.GONE);
+                mVisibletts = true;
+
                 if (slideNumber<10){
                     slideNumber = slideNumber + 1;
                     try {
                         if(slideNumber==10){
                             getQuizImage();
-                            textView.setText("Its quiz time! Click on the image above to start the quiz.");
+                            String quiztime = "Its quiz time! Click on the image above to start the quiz.";
+                            textView.setText(quiztime);
+                            playCaption(quiztime);
                             imageView.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
@@ -212,6 +237,7 @@ public class FullscreenActivity extends AppCompatActivity {
             }
         });
 
+
         // Set up the user interaction to manually show or hide the system UI.
         mContentView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -224,6 +250,40 @@ public class FullscreenActivity extends AppCompatActivity {
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
         findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
+
+        textView.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                toggletts();
+            }
+        });
+    }
+
+    private void toggletts() {
+        if (mVisibletts) {
+            stop();
+        } else {
+            play();
+        }
+    }
+
+    private void stop() {
+        // Hide UI first
+
+        mVisibletts = false;
+        t1.stop();
+
+
+    }
+
+    @SuppressLint("InlinedApi")
+    private void play() {
+
+        mVisibletts = true;
+            playCaption(caption);
+
+
     }
 
     @Override
@@ -336,9 +396,11 @@ public class FullscreenActivity extends AppCompatActivity {
     public void getImage() throws JSONException {
         JSONObject slide = (JSONObject) slides.get(slideNumber);
         final String githuburl = (String) slide.get("image");
-        String caption = (String) slide.get("text");
+        caption = (String) slide.get("text");
         indicator.setText((slideNumber +1)+ "/10");
         textView.setText(caption);
+        playCaption(caption);
+
 
 
         //Loading image using Picasso
@@ -359,6 +421,10 @@ public class FullscreenActivity extends AppCompatActivity {
         });
         Log.i("getImage", "getting slide image from github");
         builder.build().load(githuburl).into(imageView);
+    }
+
+    public void playCaption(String caption){
+        t1.speak(caption, TextToSpeech.QUEUE_FLUSH, null);
     }
 
     public void getStartingImage() throws JSONException {
@@ -436,5 +502,11 @@ public class FullscreenActivity extends AppCompatActivity {
 
     public void getNextSlide(){
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        t1.shutdown();
     }
 }

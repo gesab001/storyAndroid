@@ -1,6 +1,8 @@
 package com.resistthedevil5947.download;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -48,6 +50,7 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
     int questionnumber = 0;
     Button submit_button;
     Button tryagain_button;
+    Button exit_button;
     MediaPlayer mediaPlayer = new MediaPlayer();
     int mistakes = 0;
     ListView listView;
@@ -154,11 +157,12 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
 
         submit_button = (Button) findViewById(R.id.submit_button);
         tryagain_button = (Button) findViewById(R.id.tryagain_button);
+        exit_button = (Button) findViewById(R.id.exit_button);
         submit_button.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-                questionnumber = questionnumber + 1;
+
 
                 if (questionnumber<5){
                     if(answer.equals(userchoice)){
@@ -174,7 +178,16 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
                                 Toast.LENGTH_SHORT);
 
                         toast.show();
+                        questionnumber = questionnumber + 1;
                         loadQuestion();
+                        if (questionnumber==5){
+                            question_tv.setText("YOU MADE " + Integer.toString(mistakes) + " mistakes");
+                            listView.setVisibility(View.GONE);
+                            tryagain_button.setVisibility(View.VISIBLE);
+                            submit_button.setVisibility(View.GONE);
+
+
+                        }
 
                     }else{
                         Log.i("wrong. correct answer ", answer + userchoice);
@@ -195,33 +208,19 @@ public class QuizFullscreenActivity2 extends AppCompatActivity {
 
 
                 }
-                if (questionnumber==5){
-                    question_tv.setText("YOU MADE " + Integer.toString(mistakes) + " mistakes");
-                    listView.setVisibility(View.GONE);
-                    tryagain_button.setVisibility(View.VISIBLE);
-                    submit_button.setVisibility(View.GONE);
 
-
-                }
 
 
 
             }
         });
-        tryagain_button.setOnClickListener(new View.OnClickListener() {
+        exit_button.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-                questionnumber = 0;
-                mistakes = 0;
-                loadQuestion();
-                tryagain_button.setVisibility(View.GONE);
-                submit_button.setVisibility(View.VISIBLE);
-                listView.setVisibility(View.VISIBLE);
-
-
-
-
+                Context context = view.getContext();
+                Intent intent = new Intent(context, MainActivity.class);
+                context.startActivity(intent);
             }
         });
 
