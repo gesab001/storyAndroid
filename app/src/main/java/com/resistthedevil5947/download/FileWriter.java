@@ -31,6 +31,7 @@ public class FileWriter {
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(filename, Context.MODE_PRIVATE));
             outputStreamWriter.write(data);
             outputStreamWriter.close();
+
         }
         catch (IOException e) {
             Log.e("Exception", "File write failed: " + e.toString());
@@ -78,6 +79,10 @@ public class FileWriter {
 
     public void downloadImage(String url){
 
+
+    }
+
+    public void deleteStoryJson(){
 
     }
 }

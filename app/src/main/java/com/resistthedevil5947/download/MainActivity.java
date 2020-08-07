@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager layoutManager;
     private RecyclerView.LayoutManager layoutManager2;
     private Button dowloadstoriesbutton;
+    private Button updateButton;
     private static RecyclerView recyclerView2;
     private static RecyclerView recyclerView;
 
@@ -67,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         dowloadstoriesbutton = (Button) findViewById(R.id.downloadstories_button);
+        updateButton = (Button) findViewById(R.id.update_button);
 //        layoutManager2 = new LinearLayoutManager(this);
 //        recyclerView2.setLayoutManager(layoutManager);
 //        recyclerView2.setItemAnimator(new DefaultItemAnimator());
@@ -98,7 +100,13 @@ public class MainActivity extends AppCompatActivity {
             loadStories(filename, githuburl, localurl);
         }
 
+        updateButton.setOnClickListener(new View.OnClickListener() {
 
+            @Override
+            public void onClick(View view) {
+               updateStoryList();
+            }
+        });
 
 
 
@@ -142,6 +150,8 @@ public class MainActivity extends AppCompatActivity {
         FileWriter filewriter = new FileWriter(this);
         if(filewriter.fileExists(filename)) {
             dowloadstoriesbutton.setVisibility(View.GONE);
+            data2 = new ArrayList<DataModel2>();
+            recyclerView.setAdapter(null);
             recyclerView.setVisibility(View.VISIBLE);
             MyData2 myData2 = new MyData2(this, filename, githuburl, localurl);
             JSONArray jsonArray = myData2.getFromLocalStorage(filename);
@@ -182,6 +192,15 @@ public class MainActivity extends AppCompatActivity {
             //        recyclerView.setAdapter(adapter);
             recyclerView.setAdapter(adapter2);
         }
+    }
+
+    public void updateStoryList(){
+        String filename = "stories.json";
+        String githuburl = "https://gesab001.github.io/assets/story/stories.json";
+        String localurl = "http://192.168.1.70/assets/story/stories.json";
+        MyData2 myData2 = new MyData2(getApplicationContext(), filename, githuburl, localurl);
+        myData2.getFromGithubStorage();
+        loadStories(filename, githuburl, localurl);
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -35,7 +35,7 @@ import org.json.JSONObject;
  * status bar and navigation/system bar) with user interaction.
  */
 public class FullscreenActivity extends AppCompatActivity {
-    TextToSpeech t1;
+    TextReader t1;
     JSONArray story = new JSONArray();
     JSONObject article = new JSONObject();
     JSONArray slides = new JSONArray();
@@ -124,18 +124,10 @@ public class FullscreenActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_fullscreen);
-        t1=new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status) {
-                if(status != TextToSpeech.ERROR) {
-                    t1.setLanguage(Locale.UK);
-                    Double obj = new Double("0.5");
-                    t1.setSpeechRate(obj.floatValue());
-                }
-            }
-        });
+        t1= new TextReader(this);
 
         mVisible = true;
+        mVisibletts = true;
         mControlsView = findViewById(R.id.fullscreen_content_controls);
         mContentView = findViewById(R.id.fullscreen_content);
         Bundle bundle = getIntent().getExtras();
@@ -143,6 +135,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
         textView = findViewById(R.id.textView);
         indicator = findViewById(R.id.indicator);
+        scrollView = findViewById(R.id.scrollview);
         final TextView textViewTitle = (TextView) findViewById(R.id.textviewTitle);
         textViewTitle.setText(title.toUpperCase());
         welcomeText = "Hello there.  In this story, we are going to talk about " + title + ".  Let's begin.";
@@ -156,8 +149,8 @@ public class FullscreenActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         // Instantiate the RequestQueue.
-        Button prev = (Button) findViewById(R.id.button);
-        Button next = (Button) findViewById(R.id.button2);
+        Button prev = (Button) findViewById(R.id.prev_button);
+        Button next = (Button) findViewById(R.id.next_button);
         String filename = title.replace(" ", "_") + ".json";
 
         String githuburl = "https://gesab001.github.io/assets/story/articles/"+filename;
@@ -176,7 +169,6 @@ public class FullscreenActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                mVisibletts = true;
 
                 if (slideNumber>-2){
                     slideNumber = slideNumber - 1;
@@ -205,7 +197,6 @@ public class FullscreenActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 textViewTitle.setVisibility(View.GONE);
-                mVisibletts = true;
 
                 if (slideNumber<10){
                     slideNumber = slideNumber + 1;
@@ -376,7 +367,9 @@ public class FullscreenActivity extends AppCompatActivity {
         caption = (String) slide.get("text");
         indicator.setText((slideNumber +1)+ "/10");
         textView.setText(caption);
-        playCaption(caption);
+        if (mVisibletts){
+            playCaption(caption);
+        }
 
 
 
@@ -401,7 +394,7 @@ public class FullscreenActivity extends AppCompatActivity {
     }
 
     public void playCaption(String caption){
-        t1.speak(caption, TextToSpeech.QUEUE_FLUSH, null);
+        t1.read(caption);
     }
 
     public void getStartingImage() throws JSONException {
@@ -484,6 +477,6 @@ public class FullscreenActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        t1.shutdown();
+        t1.exit();
     }
 }
